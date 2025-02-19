@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Stock Market Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="stylesheet" href="static/css/main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Real-time Stock Market Dashboard</h1>
+        <div class="chart-container">
+            <canvas id="stockChart"></canvas>
+        </div>
+        <div class="stock-prices" id="stockPrices"></div>
+    </div>
+
+    <script>
+        // TODO: Initialize the WebSocket connection
+        // hint create a new WebSocket object 
+        const ws = new WebSocket('ws://localhost:8000/ws');
+
+        // TODO: Track previous prices for calculating changes
+        // hint create a variable to store the previous prices
+        let previousPrices = {};
+
+        // TODO: Implement the message handler
+        // update the chart data with new stock prices
+        // update the price cards with the new stock prices and the previous prices
+
+        
+        // TODO: Implement error handling
+        // print out to console.error if there is an error
+
+        // TODO: Implement connection close handling
+        // on close, print out to console.log that the connection is closed
+
+        /**
+         * 
+         * Function to update the chart data
+         * 
+         * Takes in a data object with a timestamp and a stocks object which will be added to the chart
+         * 
+         */
+        function updateChartData(data) {
+            chart.data.labels.push(data.timestamp);
+            
+            // Remove old data points if we exceed maxDataPoints
+            if (chart.data.labels.length > maxDataPoints) {
+                chart.data.labels.shift();
+                chart.data.datasets.forEach(dataset => {
+                    dataset.data.shift();
+                });
+            }
+            
+            // Update datasets
+            Object.entries(data.stocks).forEach(([stock, price], index) => {
+                chart.data.datasets[index].data.push(price);
+            });
+            
+            chart.update();
+        }
+
+        /**
+         * 
+         * Function to update the price cards
+         * 
+         * Takes in a data object with a timestamp and a stocks object and the previous prices
+         * 
+         * Checks the change in price for each stock and updates the price cards accordingly
+         * 
+         */
+        function updatePriceCards(data, previousPrices) {
+            const stockPricesDiv = document.getElementById('stockPrices');
+            stockPricesDiv.innerHTML = '';
+            
+            Object.entries(data.stocks).forEach(([stock, price]) => {
+                const change = previousPrices[stock] 
+                    ? ((price - previousPrices[stock]) / previousPrices[stock] * 100).toFixed(2)
+                    : '0.00';
+                    
+                displayStockCard(stock, price, change);
+            });
+        }
+    </script>
+    <script src="static/js/main.js"></script>
+</body>
+</html>
