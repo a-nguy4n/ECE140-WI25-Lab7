@@ -46,11 +46,18 @@ async def get():
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     # accept the websocket connection
-
+    await websocket.accept()
+    try:
     # in a loop, get the new stock prices using get_new_stock_prices()
+        while True:
+            stockData = get_new_stock_prices()
     # send the new stock prices to the client
+            await websocket.send_text(json.dumps(stockData))
     # sleep for 1 second
+            await asyncio.sleep(1)
     # repeat
+    except Exception as e:
+        print(f"WebSocket disconnected: {e}")
     return
 
 if __name__ == "__main__":

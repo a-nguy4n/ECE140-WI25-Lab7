@@ -17,22 +17,42 @@
     </div>
 
     <script>
+        //        ====== Task 1 ======
         // TODO: Initialize the WebSocket connection
         // hint create a new WebSocket object 
+        var webSocket = new WebSocket("ws://localhost:8000/ws");
 
+        //        ====== Task 2 ======
         // TODO: Track previous prices for calculating changes
         // hint create a variable to store the previous prices
-
+        var previousStockPrices = {}; 
+    
+        //        ====== Task 3 ======
         // TODO: Implement the message handler
         // update the chart data with new stock prices
         // update the price cards with the new stock prices and the previous prices
+        webSocket.onmessage = function(event){
+            var stockData = JSON.parse(event.data);
 
+            updateChartData(stockData);
+            updatePriceCards(stockData, previousStockPrices);
+
+            previousStockPrices[stockData.symbol] = stockData.price; 
+        };
         
+        //        ====== Task 4 ======
         // TODO: Implement error handling
         // print out to console.error if there is an error
+        webSocket.onerror = function(error){
+            console.error("WebSocket error: ", error);
+        };
 
+        //        ====== Task 5 ======
         // TODO: Implement connection close handling
         // on close, print out to console.log that the connection is closed
+        webSocket.onclose = function(){
+            console.log("WebSocket connection closed.");
+        };
 
         /**
          * 
